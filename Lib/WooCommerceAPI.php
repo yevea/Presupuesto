@@ -1,5 +1,5 @@
 <?php
-namespace FacturaScripts\Plugins\WooSync\Lib;
+namespace FacturaScripts\Plugins\Presupuesto\Lib;
 
 use FacturaScripts\Core\Tools;
 
@@ -11,9 +11,9 @@ class WooCommerceAPI
 
     public function __construct()
     {
-        $this->url = Tools::settings('WooSync', 'woocommerce_url', '');
-        $this->consumerKey = Tools::settings('WooSync', 'woocommerce_key', '');
-        $this->consumerSecret = Tools::settings('WooSync', 'woocommerce_secret', '');
+        $this->url = Tools::settings('Presupuesto', 'woocommerce_url', '');
+        $this->consumerKey = Tools::settings('Presupuesto', 'woocommerce_key', '');
+        $this->consumerSecret = Tools::settings('Presupuesto', 'woocommerce_secret', '');
     }
 
     public function testConnection(): bool
@@ -45,7 +45,6 @@ class WooCommerceAPI
 
         $url = rtrim($this->url, '/') . $endpoint;
         
-        // WooCommerce API v3 authentication
         $url .= '?' . http_build_query([
             'consumer_key' => $this->consumerKey,
             'consumer_secret' => $this->consumerSecret
@@ -75,10 +74,6 @@ class WooCommerceAPI
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('Invalid JSON response');
-        }
-        
-        if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
-            throw new \Exception('API authentication failed. Check credentials.');
         }
         
         return $data ?? [];
