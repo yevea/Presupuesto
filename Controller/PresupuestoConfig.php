@@ -1,12 +1,12 @@
 <?php
-namespace FacturaScripts\Plugins\WooSync\Controller;
+namespace FacturaScripts\Plugins\Presupuesto\Controller;
 
 use FacturaScripts\Core\Base\Controller;
 use FacturaScripts\Core\Base\ControllerPermissions;
 use FacturaScripts\Core\Tools;
 use Symfony\Component\HttpFoundation\Response;
 
-class WooSyncConfig extends Controller
+class PresupuestoConfig extends Controller
 {
     public $woocommerce_url = '';
     public $woocommerce_key = '';
@@ -15,7 +15,7 @@ class WooSyncConfig extends Controller
     public function getPageData(): array
     {
         $pageData = parent::getPageData();
-        $pageData['title'] = 'WooSync Configuration';
+        $pageData['title'] = 'WooCommerce Sync';
         $pageData['menu'] = 'admin';
         $pageData['icon'] = 'fas fa-sync-alt';
         $pageData['showonmenu'] = true;
@@ -26,7 +26,7 @@ class WooSyncConfig extends Controller
     {
         parent::privateCore($response, $user, $permissions);
         
-        // SIMPLE: Load settings from POST or database
+        // Load settings
         $this->loadSettings();
         
         // Handle form submission
@@ -34,31 +34,29 @@ class WooSyncConfig extends Controller
             $this->saveSettings();
         }
         
-        // Handle GET actions
-        $action = $this->request->get('action', '');
-        if ($action === 'test') {
+        // Handle test connection
+        if ($this->request->get('action') === 'test') {
             $this->testConnection();
         }
     }
     
     private function loadSettings(): void
     {
-        // First try POST data (if form was just submitted)
+        // Try POST first
         if ($this->request->getMethod() === 'POST') {
             $this->woocommerce_url = $this->request->request->get('woocommerce_url', '');
             $this->woocommerce_key = $this->request->request->get('woocommerce_key', '');
             $this->woocommerce_secret = $this->request->request->get('woocommerce_secret', '');
             
-            // If POST data exists, use it
             if (!empty($this->woocommerce_url)) {
                 return;
             }
         }
         
-        // Otherwise load from database
-        $this->woocommerce_url = Tools::settings('WooSync', 'woocommerce_url', '');
-        $this->woocommerce_key = Tools::settings('WooSync', 'woocommerce_key', '');
-        $this->woocommerce_secret = Tools::settings('WooSync', 'woocommerce_secret', '');
+        // Load from database
+        $this->woocommerce_url = Tools::settings('Presupuesto', 'woocommerce_url', '');
+        $this->woocommerce_key = Tools::settings('Presupuesto', 'woocommerce_key', '');
+        $this->woocommerce_secret = Tools::settings('Presupuesto', 'woocommerce_secret', '');
     }
     
     private function saveSettings(): void
@@ -71,17 +69,14 @@ class WooSyncConfig extends Controller
             return;
         }
         
-        // Save to database
-        Tools::settingsSet('WooSync', 'woocommerce_url', $url);
-        Tools::settingsSet('WooSync', 'woocommerce_key', $key);
-        Tools::settingsSet('WooSync', 'woocommerce_secret', $secret);
+        Tools::settingsSet('Presupuesto', 'woocommerce_url', $url);
+        Tools::settingsSet('Presupuesto', 'woocommerce_key', $key);
+        Tools::settingsSet('Presupuesto', 'woocommerce_secret', $secret);
         
-        // Update current values
         $this->woocommerce_url = $url;
         $this->woocommerce_key = $key;
         $this->woocommerce_secret = $secret;
         
-        // Simple redirect
         header('Location: ' . $this->url() . '?saved=1');
         exit();
     }
@@ -94,7 +89,7 @@ class WooSyncConfig extends Controller
         }
         
         try {
-            $wooApi = new \FacturaScripts\Plugins\WooSync\Lib\WooCommerceAPI();
+            $wooApi = new \FacturaScripts\Plugins\Presupuesto\Lib\WooCommerceAPI();
             
             if ($wooApi->testConnection()) {
                 header('Location: ' . $this->url() . '?success=Connection successful');
