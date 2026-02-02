@@ -1,0 +1,177 @@
+{% extends "Master/MenuTemplate.html.twig" %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-sync-alt fa-fw"></i> WooCommerce Sync Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Messages -->
+                    {% if app.request.query.has('saved') %}
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="fas fa-check"></i> Settings saved successfully!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    
+                    {% if app.request.query.has('success') %}
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="fas fa-check"></i> {{ app.request.query.get('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    
+                    {% if app.request.query.has('error') %}
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="fas fa-exclamation-triangle"></i> {{ app.request.query.get('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Current Settings -->
+                    {% if fsc.woocommerce_url %}
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Current Configuration:</strong><br>
+                            URL: <code>{{ fsc.woocommerce_url }}</code><br>
+                            Key: Configured<br>
+                            Secret: Configured
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Form -->
+                    <form method="post" action="{{ fsc.url() }}">
+                        <input type="hidden" name="action" value="save">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">WooCommerce Store URL *</label>
+                            <input type="url" name="woocommerce_url" class="form-control" 
+                                   value="{{ fsc.woocommerce_url }}" 
+                                   placeholder="https://yourstore.com" required>
+                            <div class="form-text">Full HTTPS URL of your WooCommerce store</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Consumer Key *</label>
+                            <input type="text" name="woocommerce_key" class="form-control" 
+                                   value="{{ fsc.woocommerce_key }}" required>
+                            <div class="form-text">From WooCommerce → Settings → Advanced → REST API</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Consumer Secret *</label>
+                            <input type="password" name="woocommerce_secret" class="form-control" 
+                                   value="{{ fsc.woocommerce_secret }}" required>
+                            <div class="form-text">From WooCommerce REST API settings</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                            
+                            {% if fsc.woocommerce_url %}
+                                <a href="{{ fsc.url() }}?action=test" class="btn btn-info">
+                                    <i class="fas fa-plug"></i> Test Connection
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if fsc.woocommerce_url %}
+                <div class="card mt-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs fa-fw"></i> Sync Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-shopping-cart fa-2x text-primary mb-3"></i>
+                                        <h6>Import Orders</h6>
+                                        <p class="small">Import WooCommerce orders</p>
+                                        <button class="btn btn-outline-primary" disabled>
+                                            <i class="fas fa-download"></i> Coming Soon
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-cube fa-2x text-primary mb-3"></i>
+                                        <h6>Sync Products</h6>
+                                        <p class="small">Sync products and prices</p>
+                                        <button class="btn btn-outline-primary" disabled>
+                                            <i class="fas fa-exchange-alt"></i> Coming Soon
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-boxes fa-2x text-primary mb-3"></i>
+                                        <h6>Update Stock</h6>
+                                        <p class="small">Update stock levels</p>
+                                        <button class="btn btn-outline-primary" disabled>
+                                            <i class="fas fa-warehouse"></i> Coming Soon
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    var url = this.querySelector('[name="woocommerce_url"]').value;
+    var key = this.querySelector('[name="woocommerce_key"]').value;
+    var secret = this.querySelector('[name="woocommerce_secret"]').value;
+    
+    if (!url || !key || !secret) {
+        e.preventDefault();
+        alert('Please fill all required fields');
+        return false;
+    }
+    
+    if (!url.startsWith('https://')) {
+        e.preventDefault();
+        alert('URL must start with https://');
+        return false;
+    }
+    
+    // Show loading
+    var btn = this.querySelector('button[type="submit"]');
+    var originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+    
+    // Restore after 3 seconds
+    setTimeout(function() {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }, 3000);
+    
+    return true;
+});
+</script>
+{% endblock %}
