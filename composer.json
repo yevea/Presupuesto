@@ -1,0 +1,8 @@
+{
+    "name": "facturascripts/presupuesto",
+    "description": "Simple WooCommerce Sync Plugin",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    }
+}
