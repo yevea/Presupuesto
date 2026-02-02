@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <table name="pages">
+        <row>
+            <column name="name">PresupuestoConfig</column>
+            <column name="title">WooCommerce Sync</column>
+            <column name="icon">fas fa-sync-alt</column>
+            <column name="menu">admin</column>
+            <column name="ordernum">90</column>
+            <column name="showonmenu">true</column>
+        </row>
+    </table>
+</database>
